@@ -193,7 +193,7 @@ input {
   top: 0;
   left: 0;
   z-index: var(--z-fixed);
-  background-color: transparent;
+  background-color: white;
 }
 
 /*=============== NAV ===============*/
@@ -202,6 +202,7 @@ input {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
 }
 
 .nav__logo, .nav__toggle {
@@ -211,6 +212,12 @@ input {
 .nav__logo {
   font-weight: var(--font-semi-bold);
 }
+.nav__logo img.logo-img {
+  height: 60px;       /* Ajustez la hauteur selon vos préférences */
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 
 .nav__toggle {
   font-size: 1.2rem;
@@ -242,7 +249,7 @@ input {
 }
 
 .nav__link {
-  color: var(--text-color-light);
+  color: var(--title-color);
   font-weight: var(--font-semi-bold);
   text-transform: uppercase;
 }
@@ -853,11 +860,12 @@ input {
     height: calc(var(--header-height) + 1.5rem);
   }
   .nav__link {
-    color: var(--white-color);
+    color: var(--title-color);
     text-transform: initial;
   }
   .nav__link:hover {
-    color: var(--white-color);
+    color: var(--first-color);
+    text-transform: initial;
   }
   .nav__dark {
     position: initial;
