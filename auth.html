@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Trip Planner | Authentication</title>
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+
+  <!-- Lien vers votre CSS principal (variables, etc.) -->
+  <link rel="stylesheet" href="assets/css/styles.css" />
+
+  <style>
+    /*******************************************************
+     1. FULLSCREEN BACKGROUND
+    ********************************************************/
+    html, body {
+      margin: 0; 
+      padding: 0; 
+      font-family: var(--body-font);
+      background: var(--body-color);
+    }
+    .auth-hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* Image de fond */
+      background: url("assets/img/home1.jpg") center/cover no-repeat;
+      overflow: hidden;
+    }
+
+    /* Overlay dégradé + blur */
+    .auth-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      backdrop-filter: blur(10px);
+      /* Dégradé plus doux, allant d'un noir léger vers une teinte plus transparente */
+      background: linear-gradient(
+        135deg,
+        rgba(0, 0, 0, 0.5),
+        rgba(14, 55, 63, 0.3)
+      );
+    }
+
+    /*******************************************************
+     2. GLASSMORPHISM CARD
+    ********************************************************/
+    .auth-container {
+      position: relative;
+      z-index: 2; /* Passe au-dessus de l’overlay */
+      width: 420px;
+      max-width: 90%;
+      padding: 2rem;
+      border-radius: 1rem;
+      /* Ombre subtile */
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+      /* Effet verre : fond translucide + blur */
+      background: rgba(255, 255, 255, 0.18); 
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    /* Logo au-dessus du formulaire */
+    .auth-logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .auth-logo img {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /*******************************************************
+     3. TITRE DU FORMULAIRE
+    ********************************************************/
+    .auth-title {
+      font-size: var(--h2-font-size);
+      color: var(--white-color);
+      margin-bottom: var(--mb-0-5);
+      font-weight: var(--font-semi-bold);
+    }
+
+    /*******************************************************
+     4. FORMULAIRES
+    ********************************************************/
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: left;
+    }
+    .auth-form label {
+      color: var(--white-color);
+      font-weight: var(--font-semi-bold);
+      margin-bottom: 0.25rem;
+      font-size: var(--normal-font-size);
+    }
+    .auth-form input {
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: var(--normal-font-size);
+      /* Fond clair translucide pour contraster avec le fond glass */
+      background: rgba(255, 255, 255, 0.65);
+      color: var(--text-color);
+      transition: 0.2s;
+    }
+    .auth-form input:focus {
+      outline: 2px solid var(--first-color);
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .auth-form button {
+      background-color: var(--first-color);
+      color: var(--white-color);
+      padding: 0.75rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: var(--font-semi-bold);
+      font-size: var(--normal-font-size);
+      transition: background 0.3s ease;
+    }
+    .auth-form button:hover {
+      background-color: var(--first-color-alt);
+    }
+
+    /* Lien pour basculer entre Login/Register */
+    .auth-toggle {
+      font-size: var(--small-font-size);
+      color: var(--white-color);
+      text-align: center;
+    }
+    .auth-toggle a {
+      color: var(--first-color);
+      font-weight: var(--font-semi-bold);
+      text-decoration: none;
+      margin-left: 0.25rem;
+    }
+
+    /*******************************************************
+     5. DASHBOARD (ZONE PROTÉGÉE)
+    ********************************************************/
+    .dashboard-section {
+  display: none; /* Masqué tant que l'utilisateur n'est pas connecté */
+  min-height: 100vh;
+  background-color: var(--body-color);
+  padding: 4rem 1rem;
+}
+
+.dashboard-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: var(--white-color);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-title {
+  margin-bottom: 1rem;
+  color: var(--title-color);
+  text-align: center;
+  font-size: var(--h2-font-size);
+}
+
+.dashboard-welcome {
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  font-size: var(--normal-font-size);
+  text-align: center;
+}
+
+.dashboard-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-cards {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.dashboard-card {
+  background-color: var(--body-color);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+.dashboard-card__title {
+  font-size: var(--h3-font-size);
+  color: var(--title-color);
+  margin-bottom: 0.75rem;
+}
+
+.dashboard-card__text {
+  color: var(--text-color);
+  font-size: var(--normal-font-size);
+  margin-bottom: 1rem;
+}
+
+.button--small {
+  padding: 0.5rem 1rem;
+  font-size: var(--small-font-size);
+  border-radius: 4px;
+}
+
+.button i {
+  font-size: 1.2rem;
+  margin-right: 0.5rem; /* Space between icon and text */
+}
+
+/* Responsive ajusté pour les petits écrans */
+@media screen and (max-width: 768px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+  .dashboard-title {
+    font-size: var(--h3-font-size);
+  }
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+    /*******************************************************
+     6. RESPONSIVE
+    ********************************************************/
+    @media screen and (max-width: 480px) {
+      .auth-container {
+        padding: 1.5rem;
+      }
+      .auth-title {
+        font-size: var(--h3-font-size);
+      }
+      .dashboard-container {
+    padding: 1.5rem;
+  }
+  .dashboard-title {
+    font-size: var(--h3-font-size);
+  }
+  .dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+    }
+  </style>
+</head>
+<body>
+  <!-- SECTION AUTH -->
+  <section class="auth-hero">
+    <div class="auth-container" id="authContainer">
+      <!-- Logo -->
+      <div class="auth-logo">
+        <a href="index.html" class="nav__logo">
+            <img src="assets/img/logo.png" alt="Trip Planner AI Logo" class="logo-img" />
+          </a>
+      </div>
+
+      <!-- Bloc LOGIN -->
+      <div id="loginDiv">
+        <h2 class="auth-title">Login</h2>
+        <form id="loginForm" class="auth-form">
+          <label for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" placeholder="Enter your username" required />
+          
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required />
+          
+          <button type="submit" class="button">
+           
+            <span>Login</span>
+          </button>
+        </form>
+        <div class="auth-toggle">
+          <span>Don't have an account?</span>
+          <a href="#" id="showRegister">Register</a>
+        </div>
+      </div>
+
+      <!-- Bloc REGISTER (caché par défaut) -->
+      <!-- Bloc REGISTER (caché par défaut) -->
+<div id="registerDiv" style="display: none;">
+    <h2 class="auth-title">Register</h2>
+    <form id="registerForm" class="auth-form">
+      <label for="registerUsername">Username</label>
+      <input type="text" id="registerUsername" placeholder="Choose a username" required />
+      
+      <label for="registerPassword">Password</label>
+      <input type="password" id="registerPassword" placeholder="Choose a password" required />
+      
+      <button type="submit">Register</button>
+    </form>
+    <div class="auth-toggle">
+      <span>Already have an account?</span>
+      <a href="#" id="showLogin">Login</a>
+      <!-- Bouton Home ajouté ici aussi -->
+      
+    </div>
+  </div>
+  
+    </div>
+  </section>
+
+  <!-- SECTION DASHBOARD (Protégée) -->
+  <section id="dashboard" class="dashboard-section">
+    <div class="dashboard-container">
+      <h2 class="dashboard-title">Dashboard</h2>
+      <p class="dashboard-welcome">
+        Welcome, <span id="usernameDisplay"></span>! You are now logged in.
+      </p>
+  
+      <!-- Boutons principaux -->
+      <div class="dashboard-buttons">
+        <button id="logoutButton" class="button">Logout</button>
+        <button id="homeButton" class="button">Home</button>
+        <!-- Vous pouvez ajouter d'autres boutons ici si nécessaire -->
+      </div>
+  
+      <!-- Contenu du dashboard : 4 cartes pour vos fonctionnalités -->
+      <div class="dashboard-cards">
+        <!-- 1) Add Trip Preferences -->
+        <div class="dashboard-card">
+          <h3 class="dashboard-card__title">Add Trip Preferences</h3>
+          <p class="dashboard-card__text">
+            Provide your travel dates, budget, and preferred activities to tailor your AI-generated trip recommendations.
+          </p>
+          <button class="button button--small">Set Preferences</button>
+        </div>
+  
+        <!-- 2) View Trip Recommendation -->
+        <div class="dashboard-card">
+          <h3 class="dashboard-card__title">View Trip Recommendation</h3>
+          <p class="dashboard-card__text">
+            Explore personalized suggestions based on your preferences. Discover the best destinations just for you.
+          </p>
+          <button class="button button--small">View Recommendations</button>
+        </div>
+  
+        <!-- 3) Manage Profile -->
+        <div class="dashboard-card">
+          <h3 class="dashboard-card__title">Manage Profile</h3>
+          <p class="dashboard-card__text">
+            Update your personal details, change your password, or upload a new profile picture. Keep your account secure.
+          </p>
+          <button class="button button--small">Edit Profile</button>
+        </div>
+  
+        <!-- 4) View Trip History -->
+        <div class="dashboard-card">
+          <h3 class="dashboard-card__title">View Trip History</h3>
+          <p class="dashboard-card__text">
+            Check out your past itineraries and relive your favorite travel memories at any time.
+          </p>
+          <button class="button button--small">History</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    /*******************************************************
+     AUTHENTIFICATION LOCALSTORAGE (DEMO)
+    ********************************************************/
+    function getUsers() {
+      const users = localStorage.getItem('users');
+      return users ? JSON.parse(users) : [];
+    }
+    function saveUsers(users) {
+      localStorage.setItem('users', JSON.stringify(users));
+    }
+
+    function showDashboard(username) {
+  // Masquer la partie authentification
+  document.querySelector('.auth-hero').style.display = 'none';
+  
+  // Afficher le dashboard
+  document.getElementById('dashboard').style.display = 'block';
+  
+  // Mettre à jour le nom d’utilisateur
+  document.getElementById('usernameDisplay').textContent = username;
+}
+
+    function toggleForms(formType) {
+      if (formType === 'login') {
+        document.getElementById('loginDiv').style.display = 'block';
+        document.getElementById('registerDiv').style.display = 'none';
+      } else {
+        document.getElementById('loginDiv').style.display = 'none';
+        document.getElementById('registerDiv').style.display = 'block';
+      }
+    }
+
+    // EVENT: Register
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('registerUsername').value.trim();
+      const password = document.getElementById('registerPassword').value;
+      
+      let users = getUsers();
+      if (users.find(u => u.username === username)) {
+        alert('User already exists!');
+        return;
+      }
+      users.push({ username, password });
+      saveUsers(users);
+      alert('Registration successful! You can now login.');
+      document.getElementById('registerUsername').value = '';
+      document.getElementById('registerPassword').value = '';
+      toggleForms('login');
+    });
+
+    // EVENT: Login
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('loginUsername').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      const users = getUsers();
+      const user = users.find(u => u.username === username && u.password === password);
+
+      if (user) {
+        localStorage.setItem('loggedInUser', username);
+        showDashboard(username);
+      } else {
+        alert('Invalid username or password!');
+      }
+    });
+
+    // EVENT: Toggle
+    document.getElementById('showRegister').addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleForms('register');
+    });
+    document.getElementById('showLogin').addEventListener('click', function(e) {
+      e.preventDefault();
+      toggleForms('login');
+    });
+
+    // EVENT: Logout
+    document.getElementById('logoutButton').addEventListener('click', function() {
+      localStorage.removeItem('loggedInUser');
+      location.reload();
+    });
+
+    if (user) {
+  localStorage.setItem('loggedInUser', username);
+  showDashboard(username);
+}
+
+document.getElementById('homeButton').addEventListener('click', function() {
+  // Redirige vers la page d'accueil, ajustez le nom du fichier si nécessaire
+  window.location.href = 'index.html';
+});
+
+    // Check if user is already logged in
+    window.onload = function() {
+      const loggedInUser = localStorage.getItem('loggedInUser');
+      if (loggedInUser) {
+        showDashboard(loggedInUser);
+      }
+    };
+  </script>
+</body>
+</html>
