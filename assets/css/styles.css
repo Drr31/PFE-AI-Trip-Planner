@@ -212,6 +212,7 @@ input {
 .nav__logo {
   font-weight: var(--font-semi-bold);
 }
+
 .nav__logo img.logo-img {
   height: 60px;       /* Ajustez la hauteur selon vos préférences */
   object-fit: contain;
